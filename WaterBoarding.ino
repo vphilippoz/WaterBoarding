@@ -1,15 +1,22 @@
+/*
+  WaterBoarding.ino - Example code for the Water Boarding project.
+  Created by Vincent Philippoz.
+
+  This code is made for the ESP32-C6 platform and is intended to be used with the Water Boarding PCB.
+*/
+
 #include <WiFi.h>
 #include <WebServer.h>
 
 // Replace with your network credentials
-const char* ssid = "your_SSID";
-const char* password = "your_PASSWORD";
+const char* ssid = "Patate";
+const char* password = "0123456789";
 
 // Create a web server object that listens for HTTP requests on port 80
 WebServer server(80);
 
 // Define GPIO pins
-const int gpioPins[] = {2, 4, 5, 18}; // Example GPIO pins
+const int gpioPins[] = {4, 5, 6, 7}; // Pump control PINs
 
 void setup() {
   // Initialize serial communication
@@ -59,6 +66,8 @@ void handleToggle(int pinIndex) {
   int pin = gpioPins[pinIndex];
   int state = digitalRead(pin);
   digitalWrite(pin, !state); // Toggle GPIO state
+
+  Serial.println("Toggled GPIO " + String(pin));
   
   server.sendHeader("Location", "/");
   server.send(303);
