@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+# KiCAD backup files
+PCB/arroseurPCB/arroseurPCB-backups/
+PCB/arroseurPCB/fab.zip
