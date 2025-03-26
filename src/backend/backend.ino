@@ -4,12 +4,10 @@ Minimal version to test the backend library.
 This code is a minimal version to test the backend library. It toggles the defined GPIOs and the corresponding LED color.
 */
 
-#include <Arduino.h>
 #include "backend.hpp"
 
 // Constants
 constexpr unsigned int SERIAL_BAUD_RATE = 115200;
-
 
 void setup() {
     // Open serial communications on the native USB port
