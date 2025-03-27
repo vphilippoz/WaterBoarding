@@ -16,7 +16,7 @@ void setup() {
   Serial.begin(SERIAL_BAUD_RATE);
 
   backend::setup();
-  web_interface::setup(backend::toggle_pump);
+  web_interface::setup(backend::toggle_pump, backend::NUM_PUMPS);
 }
 
 void loop() {

@@ -5,18 +5,20 @@ namespace web_interface {
 // Global variables definition
 WebServer server(PORT);
 bool (*global_pump_toggler)(unsigned int) = nullptr;
+unsigned int NUM_PUMPS = 0;
 
 // Private function declaration
 void handle_root(void);
 void handle_toggle(unsigned int pump_ID, bool (*pump_toggler)(unsigned int));
 
-void setup(bool (*pump_toggler)(unsigned int)) {
+void setup(bool (*pump_toggler)(unsigned int), unsigned int num_pumps) {
     /**
      * @brief Setup the web interface
     */
     // Save the pointer to pump toggler function, which ensures that the 
     // toggler function is always accessible in the handle_toggle function
     global_pump_toggler = pump_toggler;
+    NUM_PUMPS = num_pumps;
 
     // Connect to WiFi network
     WiFi.begin(SSID, PASSWORD);
@@ -28,7 +30,7 @@ void setup(bool (*pump_toggler)(unsigned int)) {
 
     // Define web server routes
     server.on("/", handle_root);
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < NUM_PUMPS; i++) {
         server.on(String("/toggle/") + String(i), 
                   [i]() { handle_toggle(i, global_pump_toggler); });
     }
@@ -43,7 +45,7 @@ void handle_root() {
      * @brief Handler for the root page
     */
     String html = "<html><body>";
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < NUM_PUMPS; i++) {
         html += "<a href=\"/toggle/" + String(i) + "\">Toggle pump " + String(i+1) + "</a><br>";
     }
     html += "</body></html>";

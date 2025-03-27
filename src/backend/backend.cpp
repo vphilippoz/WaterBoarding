@@ -10,7 +10,7 @@ void set_LED(unsigned int pump_ID, bool LED_ON=true);
 
 void setup() {
     /**
-     * @brief Setup the LED stick
+     * @brief Setup the backend of the Water Boarding project
     */
     // Configure GPIO pins as outputs and set them to inactive
     for (unsigned int i = 0; i < NUM_PUMPS; i++) {
