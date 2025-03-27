@@ -4,16 +4,20 @@ namespace web_interface {
 
 // Global variables definition
 WebServer server(PORT);
+bool (*global_pump_toggler)(unsigned int) = nullptr;
 
 // Private function declaration
 void handle_root(void);
-// void handle_toggle(unsigned int pump_ID, std::function<bool(unsigned int)> pump_toggler);
-void handle_toggle(unsigned int pump_ID);
+void handle_toggle(unsigned int pump_ID, bool (*pump_toggler)(unsigned int));
 
-void setup(std::function<bool(unsigned int)> pump_toggler) {
+void setup(bool (*pump_toggler)(unsigned int)) {
     /**
      * @brief Setup the web interface
     */
+    // Save the pointer to pump toggler function, which ensures that the 
+    // toggler function is always accessible in the handle_toggle function
+    global_pump_toggler = pump_toggler;
+
     // Connect to WiFi network
     WiFi.begin(SSID, PASSWORD);
     while (WiFi.status() != WL_CONNECTED) {
@@ -25,8 +29,8 @@ void setup(std::function<bool(unsigned int)> pump_toggler) {
     // Define web server routes
     server.on("/", handle_root);
     for (int i = 0; i < 4; i++) {
-        // server.on(String("/toggle/") + String(i), [i, &pump_toggler]() { handle_toggle(i, pump_toggler); });
-        server.on(String("/toggle/") + String(i), [i]() { handle_toggle(i); });
+        server.on(String("/toggle/") + String(i), 
+                  [i]() { handle_toggle(i, global_pump_toggler); });
     }
 
     // Start the web server
@@ -47,17 +51,16 @@ void handle_root() {
     server.send(200, "text/html", html);
 }
 
-// void handle_toggle(unsigned int pump_ID, std::function<bool(unsigned int)> pump_toggler) {
-void handle_toggle(unsigned int pump_ID) {
+void handle_toggle(unsigned int pump_ID, bool (*pump_toggler)(unsigned int)) {
     /**
      * @brief Handler for the one of the toggling page
      * 
      * @param pump_ID: ID of the pump toggled
     */
     // Toggle the pump
-    // bool pump_state = pump_toggler(pump_ID);
+    bool pump_state = pump_toggler(pump_ID);
 
-    Serial.println("Toggled pump " + String(pump_ID));
+    Serial.println("Toggled pump " + String(pump_ID+1));
     
     // Send response (redirect client to home page)
     server.sendHeader("Location", "/");
