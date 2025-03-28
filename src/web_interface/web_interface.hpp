@@ -15,7 +15,7 @@ namespace web_interface {
     extern WebServer server;
 
     // Function prototypes
-    void setup(bool (*pump_toggler)(unsigned int));
+    void setup(bool (*pump_toggler)(unsigned int), unsigned int num_pumps);
     
 } // namespace web_interface
 
