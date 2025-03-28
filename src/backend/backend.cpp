@@ -1,9 +1,11 @@
 #include "backend.hpp"
+#include <FastLED.h>
 
 namespace backend {
 
 // Global variables definition
 bool pumps_active[] = {false, false, false, false};
+CRGB led[NUM_LEDS];
 
 // Private function declaration
 void set_LED(unsigned int pump_ID, bool LED_ON=true);
@@ -19,6 +21,10 @@ void setup() {
     }
 
     // Setup the onboard LED
+    FastLED.addLeds<WS2812, LED_PIN, GRB>(led, NUM_LEDS);
+    FastLED.setBrightness(BRIGHTNESS);
+    led[0] = BLACK;
+    FastLED.show();
 }
 
 bool toggle_pump(unsigned int pump_ID) {
@@ -34,14 +40,14 @@ bool toggle_pump(unsigned int pump_ID) {
         // Stop the pump and set LED to black
         digitalWrite(PUMPS_PINS[pump_ID], LOW);
 
-        // Set LED to corresponding color
-        set_LED(pump_ID);
+        // Turn off LED corresponding color
+        set_LED(pump_ID, false);
     } else {
         // Start the pump
         digitalWrite(PUMPS_PINS[pump_ID], HIGH);
 
         // Set LED to corresponding color
-        set_LED(pump_ID, false);
+        set_LED(pump_ID, true);
     }
 
     // Update pump state
@@ -57,8 +63,31 @@ void set_LED(unsigned int pump_ID, bool LED_ON) {
      * @brief Toggle a pump and set the LED to the corresponding color
      * 
      * @param pump_ID: ID of the pump toggle
+     * @param LED_ON: If the LED should be active or not
     */
-    // TODO: Implement the function
+    if(LED_ON) {
+        switch (pump_ID)
+        {
+        case 0:
+            led[0] = RED;
+            break;
+        case 1:
+            led[0] = GREEN;
+            break;
+        case 2:
+            led[0] = BLUE;
+            break;
+        case 3:
+            led[0] = YELLOW;
+            break;
+        default:
+            led[0] = WHITE;
+            break;
+        }
+    } else {
+        led[0] = BLACK;
+    }
+    FastLED.show();
 }
 
 } // namespace backend
