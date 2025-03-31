@@ -29,7 +29,7 @@ void setup() {
 
 bool toggle_pump(unsigned int pump_ID) {
     /**
-     * @brief Toggle a pump and set the LED to the corresponding color
+     * @brief Toggles a pump and update the LED color correspondingly
      * 
      * @param pump_ID: ID of the pump to toggle
      * @return New state of the pump (true == active)
@@ -38,21 +38,61 @@ bool toggle_pump(unsigned int pump_ID) {
 
     if(pump_running) {
         // Stop the pump and set LED to black
-        digitalWrite(PUMPS_PINS[pump_ID], LOW);
+        return reset_pump(pump_ID);
     } else {
         // Start the pump
-        digitalWrite(PUMPS_PINS[pump_ID], HIGH);
+        return set_pump(pump_ID);
     }
+}
+
+bool set_pump(unsigned int pump_ID) {
+    /**
+     * @brief Activates a pump and update the LED color correspondingly
+     * 
+     * @param pump_ID: ID of the pump to activate
+     * @return New state of the pump (true == active)
+    */
+    bool pump_running = pumps_active[pump_ID];
+
+    // Do nothing if the pump is already active
+    if(pump_running) {return true;}
+
+    // Start the pump
+    digitalWrite(PUMPS_PINS[pump_ID], HIGH);
 
     // Update pump state
-    pump_running = !pump_running;
-    pumps_active[pump_ID] = pump_running;
-    Serial.println("Toggled PIN " + String(PUMPS_PINS[pump_ID]));
+    pumps_active[pump_ID] = true;
+    Serial.println("High on PIN " + String(PUMPS_PINS[pump_ID]));
 
     // Update LED color
     set_LED();
     
-    return pump_running;
+    return true;
+}
+
+bool reset_pump(unsigned int pump_ID) {
+    /**
+     * @brief Deactivates a pump and update the LED color correspondingly
+     * 
+     * @param pump_ID: ID of the pump to deactivate
+     * @return New state of the pump (true == active)
+    */
+    bool pump_running = pumps_active[pump_ID];
+
+    // Do nothing if the pump is already inactive
+    if(!pump_running) {return false;}
+
+    // Stop the pump
+    digitalWrite(PUMPS_PINS[pump_ID], LOW);
+
+    // Update pump state
+    pumps_active[pump_ID] = false;
+    Serial.println("Low on PIN " + String(PUMPS_PINS[pump_ID]));
+
+    // Update LED color
+    set_LED();
+    
+    return false;
 }
 
 void set_LED() {
