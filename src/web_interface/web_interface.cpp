@@ -6,12 +6,13 @@ namespace web_interface {
 WebServer server(PORT);
 bool (*global_pump_toggler)(unsigned int) = nullptr;
 unsigned int NUM_PUMPS = 0;
+bool VERBOSE = false;
 
 // Private function declaration
 void handle_root(void);
 void handle_toggle(unsigned int pump_ID, bool (*pump_toggler)(unsigned int));
 
-void setup(bool (*pump_toggler)(unsigned int), unsigned int num_pumps) {
+void setup(bool (*pump_toggler)(unsigned int), unsigned int num_pumps, bool verbose) {
     /**
      * @brief Setup the web interface
     */
@@ -19,14 +20,15 @@ void setup(bool (*pump_toggler)(unsigned int), unsigned int num_pumps) {
     // toggler function is always accessible in the handle_toggle function
     global_pump_toggler = pump_toggler;
     NUM_PUMPS = num_pumps;
+    VERBOSE = verbose;
 
     // Connect to WiFi network
     WiFi.begin(SSID, PASSWORD);
     while (WiFi.status() != WL_CONNECTED) {
         delay(1000);
-        Serial.println("Connecting to WiFi...");
+        if(VERBOSE) {Serial.println("Connecting to WiFi...");}
     }
-    Serial.println("Connected to WiFi");
+    if(VERBOSE) {Serial.println("Connected to WiFi");}
 
     // Define web server routes
     server.on("/", handle_root);
@@ -37,7 +39,7 @@ void setup(bool (*pump_toggler)(unsigned int), unsigned int num_pumps) {
 
     // Start the web server
     server.begin();
-    Serial.println("Web server started");
+    if(VERBOSE) {Serial.println("Web server started");}
 }
 
 void handle_root() {
@@ -62,7 +64,7 @@ void handle_toggle(unsigned int pump_ID, bool (*pump_toggler)(unsigned int)) {
     // Toggle the pump
     bool pump_state = pump_toggler(pump_ID);
 
-    Serial.println("Toggled pump " + String(pump_ID+1));
+    if(VERBOSE) {Serial.println("Toggled pump " + String(pump_ID+1));}
     
     // Send response (redirect client to home page)
     server.sendHeader("Location", "/");

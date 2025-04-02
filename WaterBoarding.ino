@@ -10,16 +10,19 @@
 
 // Constants
 constexpr unsigned int SERIAL_BAUD_RATE = 115200;
+constexpr bool DEBUG = false;
 
 void setup() {
-  // Initialize serial communication
-  Serial.begin(SERIAL_BAUD_RATE);
+    if(DEBUG) {
+      // Initialize serial communication
+        Serial.begin(SERIAL_BAUD_RATE);
+    }
 
-  backend::setup();
-  web_interface::setup(backend::toggle_pump, backend::NUM_PUMPS);
+    backend::setup(DEBUG);
+    web_interface::setup(backend::toggle_pump, backend::NUM_PUMPS, DEBUG);
 }
 
 void loop() {
-  // Handle client requests
-  web_interface::server.handleClient();
+    // Handle client requests
+    web_interface::server.handleClient();
 }

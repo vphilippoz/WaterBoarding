@@ -10,7 +10,7 @@ namespace backend {
     constexpr unsigned int BRIGHTNESS = 100;    // LEDs brightness, 0-255
 
     // Pinout
-    constexpr unsigned int PUMPS_PINS[] =   {4, 5, 6, 7};// Pins to control the water pumps
+    constexpr unsigned int PUMPS_PINS[] =   {2, 3, 4, 5};// Pins to control the water pumps
     constexpr unsigned int LED_PIN =         8;          // Pin for onboard RGB LED
 
     // Colors
@@ -20,7 +20,7 @@ namespace backend {
     // extern bool pumps_active[];
 
     // Function prototypes
-    void setup(void);
+    void setup(bool verbose);
     bool toggle_pump(unsigned int pump_ID);
     bool set_pump(unsigned int pump_ID);
     bool reset_pump(unsigned int pump_ID);

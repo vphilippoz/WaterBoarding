@@ -4,16 +4,20 @@
 namespace backend {
 
 // Global variables definition
+bool VERBOSE = false;
 bool pumps_active[] = {false, false, false, false};
 CRGB led[NUM_LEDS];
 
 // Private function declaration
 void set_LED();
 
-void setup() {
+void setup(bool verbose) {
     /**
      * @brief Setup the backend of the Water Boarding project
     */
+    // Save verbose mode
+    VERBOSE = verbose;
+
     // Configure GPIO pins as outputs and set them to inactive
     for (unsigned int i = 0; i < NUM_PUMPS; i++) {
         pinMode(PUMPS_PINS[i], OUTPUT);
@@ -62,7 +66,7 @@ bool set_pump(unsigned int pump_ID) {
 
     // Update pump state
     pumps_active[pump_ID] = true;
-    Serial.println("High on PIN " + String(PUMPS_PINS[pump_ID]));
+    if(VERBOSE) {Serial.println("High on PIN " + String(PUMPS_PINS[pump_ID]));}
 
     // Update LED color
     set_LED();
@@ -87,7 +91,7 @@ bool reset_pump(unsigned int pump_ID) {
 
     // Update pump state
     pumps_active[pump_ID] = false;
-    Serial.println("Low on PIN " + String(PUMPS_PINS[pump_ID]));
+    if(VERBOSE) {Serial.println("Low on PIN " + String(PUMPS_PINS[pump_ID]));}
 
     // Update LED color
     set_LED();

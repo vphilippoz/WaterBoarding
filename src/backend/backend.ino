@@ -8,14 +8,17 @@ This code is a minimal version to test the backend library. It toggles the defin
 
 // Constants
 constexpr unsigned int SERIAL_BAUD_RATE = 115200;
+constexpr bool DEBUG = false;
 
 void setup() {
-    // Open serial communications on the native USB port
-    Serial.begin(SERIAL_BAUD_RATE);while(!Serial);
+    if(DEBUG) {
+        // Open serial communications on the native USB port
+        Serial.begin(SERIAL_BAUD_RATE);while(!Serial);
+    }
 
     // Setup the library
-    backend::setup();
-    Serial.println("Setup complete");
+    backend::setup(DEBUG);
+    if(DEBUG) {Serial.println("Setup complete");}
 }
 
 void loop() {
