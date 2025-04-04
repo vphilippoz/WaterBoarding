@@ -11,7 +11,7 @@ const char index_html[] = R"rawliteral(
 <!DOCTYPE HTML>
 <html>
 <head>
-    <title>ESP32 Web Control</title>
+    <title>Controle d'arrosage</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         body {
@@ -39,23 +39,41 @@ const char index_html[] = R"rawliteral(
             width: 200px;
         }
         button:hover {
-            background-color: #45a049;
+            opacity: 0.8;
+        }
+        .red {
+            background-color: rgb(218, 0, 0);
         }
     </style>
 </head>
 <body>
     <div class="button-container">
-        <button onclick="sendRequest(0)">Pompe 1</button>
-        <button onclick="sendRequest(1)">Pompe 2</button>
-        <button onclick="sendRequest(2)">Pompe 3</button>
-        <button onclick="sendRequest(3)">Pompe 4</button>
+        <button id="button0" onclick="sendRequest(0)">Demarrer la pompe 1</button>
+        <button id="button1" onclick="sendRequest(1)">Demarrer la pompe 2</button>
+        <button id="button2" onclick="sendRequest(2)">Demarrer la pompe 3</button>
+        <button id="button3" onclick="sendRequest(3)">Demarrer la pompe 4</button>
     </div>
     <script>
         function sendRequest(buttonNumber) {
             fetch('/button' + buttonNumber)
                 .then(response => response.text())
-                .then(data => console.log('Response:', data))
+                .then(data => {
+                    console.log('Response:', data);
+                    updateButtonAppearance(buttonNumber, data);
+                })
                 .catch(error => console.error('Error:', error));
+
+        function updateButtonAppearance(buttonNumber, data) {
+            const button = document.getElementById('button'+buttonNumber);
+            buttonNumberTxt = buttonNumber + 1
+            if (data === 'inactive') {
+                button.textContent = 'Demarrer la pompe ' + buttonNumberTxt;
+                button.classList.remove('red');
+            } else if (data === 'active') {
+                button.textContent = 'Arreter la pompe ' + buttonNumberTxt;
+                button.classList.add('red');
+            }
+        }
         }
     </script>
 </body>
@@ -119,7 +137,10 @@ void handle_toggle(unsigned int pump_ID, bool (*pump_toggler)(unsigned int)) {
     if(VERBOSE) {Serial.println("Toggled pump " + String(pump_ID+1));}
     
     // Send response
-    server.send(200, "text/plain", "Pump " + String(pump_ID+1) + " pressed");
+    // server.send(200, "text/plain", "Pump " + String(pump_ID+1) + " pressed");
+    server.send(200, "text/plain", pump_state ? "active" : "inactive");
+
+    // return pump_state ? "active" : "inactive";
 }
 
 } // namespace web_interface
