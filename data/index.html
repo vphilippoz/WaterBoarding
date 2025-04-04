@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>ESP32 Web Control</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            width: 200px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="button-container">
+        <button onclick="sendRequest(0)">Pompe 1</button>
+        <button onclick="sendRequest(1)">Pompe 2</button>
+        <button onclick="sendRequest(2)">Pompe 3</button>
+        <button onclick="sendRequest(3)">Pompe 4</button>
+    </div>
+    <script>
+        function sendRequest(buttonNumber) {
+            fetch('/button' + buttonNumber)
+                .then(response => response.text())
+                .then(data => console.log('Response:', data))
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>

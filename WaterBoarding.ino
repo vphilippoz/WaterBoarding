@@ -10,7 +10,7 @@
 
 // Constants
 constexpr unsigned int SERIAL_BAUD_RATE = 115200;
-constexpr bool DEBUG = false;
+constexpr bool DEBUG = true;
 
 void setup() {
     if(DEBUG) {
