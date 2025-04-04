@@ -47,6 +47,7 @@ const char index_html[] = R"rawliteral(
     </style>
 </head>
 <body>
+    <h1 class="title">Controle d'arrosage</h1>
     <div class="button-container">
         <button id="button0" onclick="sendRequest(0)">Demarrer la pompe 1</button>
         <button id="button1" onclick="sendRequest(1)">Demarrer la pompe 2</button>
