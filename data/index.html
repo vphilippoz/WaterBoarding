@@ -53,6 +53,7 @@
                     updateButtonAppearance(buttonNumber, data);
                 })
                 .catch(error => console.error('Error:', error));
+        }
 
         function updateButtonAppearance(buttonNumber, data) {
             const button = document.getElementById('button'+buttonNumber);
@@ -64,7 +65,6 @@
                 button.textContent = 'Arreter la pompe ' + buttonNumberTxt;
                 button.classList.add('red');
             }
-        }
         }
     </script>
 </body>

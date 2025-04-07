@@ -63,6 +63,7 @@ const char index_html[] = R"rawliteral(
                     updateButtonAppearance(buttonNumber, data);
                 })
                 .catch(error => console.error('Error:', error));
+        }
 
         function updateButtonAppearance(buttonNumber, data) {
             const button = document.getElementById('button'+buttonNumber);
@@ -74,7 +75,6 @@ const char index_html[] = R"rawliteral(
                 button.textContent = 'Arreter la pompe ' + buttonNumberTxt;
                 button.classList.add('red');
             }
-        }
         }
     </script>
 </body>
