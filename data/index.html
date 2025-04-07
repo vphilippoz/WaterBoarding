@@ -1,13 +1,3 @@
-#include "web_interface.hpp"
-
-namespace web_interface {
-
-// Global variables definition
-WebServer server(PORT);
-bool (*global_pump_toggler)(unsigned int) = nullptr;
-unsigned int NUM_PUMPS = 0;
-bool VERBOSE = false;
-const char index_html[] = R"rawliteral(
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -67,7 +57,7 @@ const char index_html[] = R"rawliteral(
 
         function updateButtonAppearance(buttonNumber, data) {
             const button = document.getElementById('button'+buttonNumber);
-            let buttonNumberTxt = buttonNumber + 1;
+            buttonNumberTxt = buttonNumber + 1
             if (data === 'inactive') {
                 button.textContent = 'Demarrer la pompe ' + buttonNumberTxt;
                 button.classList.remove('red');
@@ -79,69 +69,3 @@ const char index_html[] = R"rawliteral(
     </script>
 </body>
 </html>
-)rawliteral";
-
-// Private function declaration
-void handle_root(void);
-void handle_toggle(unsigned int pump_ID, bool (*pump_toggler)(unsigned int));
-
-void setup(bool (*pump_toggler)(unsigned int), unsigned int num_pumps, bool verbose) {
-    /**
-     * @brief Setup the web interface
-    */
-    // Save the pointer to pump toggler function, which ensures that the 
-    // toggler function is always accessible in the handle_toggle function
-    global_pump_toggler = pump_toggler;
-    NUM_PUMPS = num_pumps;
-    VERBOSE = verbose;
-
-    // Connect to WiFi network
-    WiFi.begin(SSID, PASSWORD);
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(1000);
-        if(VERBOSE) {Serial.println("Connecting to WiFi...");}
-    }
-    if(VERBOSE) {
-        Serial.println("Connected to WiFi");
-        Serial.print("IP Address: ");
-        Serial.println(WiFi.localIP());
-    }
-
-    server.on("/", HTTP_GET, handle_root);
-
-    for (int i = 0; i < NUM_PUMPS; i++) {
-        server.on(String("/button") + String(i), HTTP_GET,
-                  [i]() { handle_toggle(i, global_pump_toggler); });
-    }
-
-    // Start the web server
-    server.begin();
-    if(VERBOSE) {Serial.println("Web server started");}
-}
-
-void handle_root() {
-    /**
-     * @brief Handler for the root page
-    */
-    server.send(200, "text/html", index_html);
-}
-
-void handle_toggle(unsigned int pump_ID, bool (*pump_toggler)(unsigned int)) {
-    /**
-     * @brief Handler for the one of the toggling page
-     * 
-     * @param pump_ID: ID of the pump toggled
-    */
-    // Toggle the pump
-    bool pump_state = pump_toggler(pump_ID);
-
-    if(VERBOSE) {Serial.println("Toggled pump " + String(pump_ID+1));}
-    
-    // Send response
-    // server.send(200, "text/plain", "Pump " + String(pump_ID+1) + " pressed");
-    server.send(200, "text/plain", pump_state ? "active" : "inactive");
-
-    // return pump_state ? "active" : "inactive";
-}
-
-} // namespace web_interface

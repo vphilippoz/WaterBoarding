@@ -10,7 +10,7 @@ namespace backend {
     constexpr unsigned int BRIGHTNESS = 100;    // LEDs brightness, 0-255
 
     // Pinout
-    constexpr unsigned int PUMPS_PINS[] =   {2, 3, 4, 5};// Pins to control the water pumps
+    constexpr unsigned int PUMPS_PINS[] =   {5, 4, 3, 2};// Pins to control the water pumps
     constexpr unsigned int LED_PIN =         8;          // Pin for onboard RGB LED
 
     // Colors
