@@ -99,6 +99,28 @@ bool reset_pump(unsigned int pump_ID) {
     return false;
 }
 
+void deliver_ml(unsigned int pump_ID, unsigned int ml) {
+    /**
+     * @brief Deliver a specific amount of water using the pumps
+     * 
+     * If the function is called while the pump is already active, the previous command is overridden.
+     * 
+     * @param pump_ID: ID of the pump to use
+     * @param ml: Amount of water to deliver in milliliters
+    */
+    // Compute the time to run the pump
+    unsigned int time_to_run_ms = ml / FLOW_RATE; 
+
+    // Activate the pump if it is not already active
+    if(!pumps_active[pump_ID]) {set_pump(pump_ID);}
+
+    // Wait for the pump to run
+    delay(time_to_run_ms);
+
+    // Stop the pump
+    reset_pump(pump_ID);
+}
+
 void set_LED() {
     /**
      * @brief Toggle a pump and set the LED to the corresponding color

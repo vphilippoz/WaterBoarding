@@ -22,22 +22,27 @@ void setup() {
 }
 
 void loop() {
-    // Toggle individually each pump
+    // // Toggle individually each pump
+    // for(unsigned int i = 0; i < backend::NUM_PUMPS; i++) {
+    //     backend::toggle_pump(i);
+    //     delay(300);
+    //     backend::toggle_pump(i);
+    //     delay(100);
+    // }
+
+    // delay(1000);
+
+    // // Toggle all pumps
+    // for(unsigned int i = 0; i < backend::NUM_PUMPS*2; i++) {
+    //     backend::toggle_pump(i%backend::NUM_PUMPS);
+    //     delay(200);
+    // }
+
+    // Deliver 1 L on each pump
     for(unsigned int i = 0; i < backend::NUM_PUMPS; i++) {
-        backend::toggle_pump(i);
-        delay(300);
-        backend::toggle_pump(i);
-        delay(100);
-    }
-
-    delay(1000);
-
-    // Toggle all pumps
-    for(unsigned int i = 0; i < backend::NUM_PUMPS*2; i++) {
-        backend::toggle_pump(i%backend::NUM_PUMPS);
+        backend::deliver_ml(i, 1000);
         delay(200);
     }
 
     delay(1000);
-
 }

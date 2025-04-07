@@ -8,6 +8,7 @@ namespace backend {
     constexpr unsigned int NUM_PUMPS = 4;       // Number of pumps
     constexpr unsigned int NUM_LEDS = 1;        // Number of LEDs
     constexpr unsigned int BRIGHTNESS = 100;    // LEDs brightness, 0-255
+    constexpr float FLOW_RATE = 1.0;       // Flow rate in L/s
 
     // Pinout
     constexpr unsigned int PUMPS_PINS[] =   {5, 4, 3, 2};// Pins to control the water pumps
@@ -24,7 +25,7 @@ namespace backend {
     bool toggle_pump(unsigned int pump_ID);
     bool set_pump(unsigned int pump_ID);
     bool reset_pump(unsigned int pump_ID);
-
+    void deliver_ml(unsigned int pump_ID, unsigned int ml);
     
 } // namespace knobs
 
