@@ -67,7 +67,7 @@ const char index_html[] = R"rawliteral(
 
         function updateButtonAppearance(buttonNumber, data) {
             const button = document.getElementById('button'+buttonNumber);
-            buttonNumberTxt = buttonNumber + 1
+            let buttonNumberTxt = buttonNumber + 1;
             if (data === 'inactive') {
                 button.textContent = 'Demarrer la pompe ' + buttonNumberTxt;
                 button.classList.remove('red');
