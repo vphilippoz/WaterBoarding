@@ -25,7 +25,7 @@ namespace backend {
     bool toggle_pump(unsigned int pump_ID);
     bool set_pump(unsigned int pump_ID);
     bool reset_pump(unsigned int pump_ID);
-    void deliver_ml(unsigned int pump_ID, unsigned int ml);
+    bool deliver_ml(unsigned int pump_ID, unsigned int ml);
     
 } // namespace knobs
 

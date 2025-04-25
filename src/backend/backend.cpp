@@ -99,7 +99,7 @@ bool reset_pump(unsigned int pump_ID) {
     return false;
 }
 
-void deliver_ml(unsigned int pump_ID, unsigned int ml) {
+bool deliver_ml(unsigned int pump_ID, unsigned int ml) {
     /**
      * @brief Deliver a specific amount of water using the pumps
      * 
@@ -119,6 +119,8 @@ void deliver_ml(unsigned int pump_ID, unsigned int ml) {
 
     // Stop the pump
     reset_pump(pump_ID);
+
+    return true;
 }
 
 void set_LED() {
