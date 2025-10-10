@@ -126,7 +126,7 @@ bool deliver_ml(unsigned int pump_ID, unsigned int ml) {
 
 void set_LED() {
     /**
-     * @brief Toggle a pump and set the LED to the corresponding color
+     * @brief Set the LED color according to the pumps states
     */
     unsigned int red_level = 0;
     unsigned int green_level = 0;
