@@ -103,6 +103,20 @@ const char index_html[] = R"rawliteral(
         <button id="button2" onclick="sendRequest(2)">Démarrer la pompe 3</button>
         <button id="button3" onclick="sendRequest(3)">Démarrer la pompe 4</button>
     </div>
+    <div class="button-container">
+        <label> Choisir une pompe :</label>
+        <select id="selectPump" name="Pompe">
+            <option value=0 selected>Pompe 1</option>
+            <option value=1>Pompe 2</option>
+            <option value=2>Pompe 3</option>
+            <option value=3>Pompe 4</option>
+        </select>
+
+        <label> Choisir une quantité d'eau :</label>
+        <input id="sliderQuantity" type="range" min="1" max="20" value="10" class="slider">
+        <button id="buttonDeliver" onclick="startDelivery()">Arroser</button>
+        <button id="buttonDeliverCancel" hidden="hidden" onclick="cancelDelivery()">Annuler</button>
+    </div>
     <script>
         // Get elements from document
         const sliderQuantity = document.getElementById("sliderQuantity");
