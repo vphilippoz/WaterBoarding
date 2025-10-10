@@ -12,7 +12,9 @@ constexpr unsigned int NUM_PUMPS = 4;
 constexpr bool DEBUG = false;
 
 
-bool dummy_toggler(unsigned int n) {return true;}
+bool dummy_toggler(unsigned int n) {Serial.print("Toggling pump "); Serial.println(n); return true;}
+bool dummy_deliver_ml(unsigned int n, unsigned int ml) {Serial.print("Delivering "); Serial.print(ml); Serial.print("ml to pump "); Serial.println(n); return true;}
+bool dummy_reset_pump(unsigned int n) {Serial.print("Resetting pump "); Serial.println(n); return true;}
 
 void setup() {
     if(DEBUG) {
@@ -22,7 +24,7 @@ void setup() {
     }
 
     // Setup the web interface
-    web_interface::setup(&dummy_toggler, NUM_PUMPS, DEBUG);
+    web_interface::setup(&dummy_toggler, &dummy_deliver_ml, &dummy_reset_pump, NUM_PUMPS, DEBUG);
     if(DEBUG) {Serial.println("Web server started");}
 }
 

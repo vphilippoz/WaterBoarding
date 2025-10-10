@@ -99,7 +99,7 @@ bool reset_pump(unsigned int pump_ID) {
     return false;
 }
 
-void deliver_ml(unsigned int pump_ID, unsigned int ml) {
+bool deliver_ml(unsigned int pump_ID, unsigned int ml) {
     /**
      * @brief Deliver a specific amount of water using the pumps
      * 
@@ -107,6 +107,7 @@ void deliver_ml(unsigned int pump_ID, unsigned int ml) {
      * 
      * @param pump_ID: ID of the pump to use
      * @param ml: Amount of water to deliver in milliliters
+     * @return true if the command was successful
     */
     // Compute the time to run the pump
     unsigned int time_to_run_ms = ml / FLOW_RATE; 
@@ -119,6 +120,8 @@ void deliver_ml(unsigned int pump_ID, unsigned int ml) {
 
     // Stop the pump
     reset_pump(pump_ID);
+
+    return true;
 }
 
 void set_LED() {

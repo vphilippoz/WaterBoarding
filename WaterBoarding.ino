@@ -19,7 +19,7 @@ void setup() {
     }
 
     backend::setup(DEBUG);
-    web_interface::setup(backend::toggle_pump, backend::NUM_PUMPS, DEBUG);
+    web_interface::setup(backend::toggle_pump, backend::deliver_ml, backend::reset_pump, backend::NUM_PUMPS, DEBUG);
 }
 
 void loop() {
