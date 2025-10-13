@@ -18,11 +18,14 @@ void setup() {
         Serial.begin(SERIAL_BAUD_RATE);
     }
 
-    backend::setup(DEBUG);
     web_interface::setup(backend::toggle_pump, backend::NUM_PUMPS, DEBUG);
+    backend::setup(DEBUG); // Wifi is required for backend setup
 }
 
 void loop() {
     // Handle client requests
     web_interface::server.handleClient();
+
+    // Follow watering schedule
+    backend::handle_schedule();
 }

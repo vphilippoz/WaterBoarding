@@ -2,6 +2,7 @@
 #define BACKEND_H
 
 #include <Arduino.h>
+#include <time.h>
 
 namespace backend {
     // Constants
@@ -16,6 +17,12 @@ namespace backend {
     // Colors
     #define BLACK   CHSV(0, 0, 0)
 
+    // Watering schedule (one entry per pump)
+    constexpr bool WATERING_ACTIVE[] =              {true, true, false, false}; // Whether the pump should follow the schedule
+    constexpr unsigned int WATERING_VOLUME_ML[] =    {10, 10, 10, 10}; // Volume of water to dispense (in mL)
+    constexpr unsigned int WATERING_HOUR[] =        {18, 18, 18, 18}; // Hour of the day to water the plants (0-23)
+    constexpr unsigned int WATERING_MINUTE[] =      {0, 0, 0, 0};  // Minute of the hour to water the plants (0-59)
+
     // Global variables declaration
     // extern bool pumps_active[];
 
@@ -24,8 +31,8 @@ namespace backend {
     bool toggle_pump(unsigned int pump_ID);
     bool set_pump(unsigned int pump_ID);
     bool reset_pump(unsigned int pump_ID);
+    void handle_schedule();
 
-    
-} // namespace knobs
+} // namespace backend
 
 #endif // BACKEND_H

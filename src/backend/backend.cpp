@@ -29,6 +29,9 @@ void setup(bool verbose) {
     FastLED.setBrightness(BRIGHTNESS);
     led[0] = BLACK;
     FastLED.show();
+
+    // Initialize time synchronisation
+    configTime(0, 0, "pool.ntp.org");
 }
 
 bool toggle_pump(unsigned int pump_ID) {
@@ -115,6 +118,48 @@ void set_LED() {
 
     led[0] = CRGB(red_level, green_level, blue_level);
     FastLED.show();
+}
+
+void deliver_ml(unsigned int pump_ID, unsigned int volume_ml) {
+    /**
+     * @brief Delivers a specific volume of water through the specified pump
+     * 
+     * @param pump_ID: ID of the pump to use
+     * @param volume_ml: Volume of water to deliver (in mL)
+    */
+    // To be implemented
+}
+
+void handle_schedule() {
+    /**
+     * @brief Follow a predefined watering schedule
+    */
+    // Get current time
+    struct tm timeinfo;
+    if(!getLocalTime(&timeinfo)) {
+        if(VERBOSE) {Serial.println("Failed to obtain time");}
+        return;
+    }
+    static unsigned int last_handled_minute = 61; // Initialize to an invalid minute to ensure the schedule is handled at startup
+
+    // Only handle the schedule once per minute
+    if(timeinfo.tm_min == last_handled_minute) {return;}
+    last_handled_minute = timeinfo.tm_min;
+
+    // Check each pump's schedule
+    for (unsigned int pump_ID = 0; pump_ID < NUM_PUMPS;) {
+        if(WATERING_ACTIVE[pump_ID]) {
+            // Check if it's time to water
+            if(timeinfo.tm_hour == WATERING_HOUR[pump_ID] && timeinfo.tm_min == WATERING_MINUTE[pump_ID]) {
+                if(VERBOSE) {Serial.println("Scheduled watering for pump " + String(pump_ID+1));}
+                
+                // Deliver the specified volume of water
+                deliver_ml(pump_ID, WATERING_VOLUME_ML[pump_ID]);
+
+                if(VERBOSE) {Serial.println("Delivered " + String(WATERING_VOLUME_ML[pump_ID]) + " mL of water with pump " + String(pump_ID+1));}
+            }
+        }
+    }
 }
 
 } // namespace backend
