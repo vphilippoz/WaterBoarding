@@ -16,6 +16,7 @@ void setup() {
     if(DEBUG) {
       // Initialize serial communication
         Serial.begin(SERIAL_BAUD_RATE);
+        delay(500); // Wait for serial to initialize
     }
 
     backend::setup(DEBUG);

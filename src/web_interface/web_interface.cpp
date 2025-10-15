@@ -1,3 +1,4 @@
+#include <ArduinoJson.h>
 #include "web_interface.hpp"
 
 namespace web_interface {
@@ -8,7 +9,7 @@ bool (*global_pump_toggler)(unsigned int) = nullptr;
 bool (*global_reset_pump)(unsigned int) = nullptr;
 bool (*global_deliver_ml)(unsigned int, unsigned int) = nullptr;
 unsigned int NUM_PUMPS = 0;
-bool VERBOSE = false;
+bool VERBOSE = true;
 const char index_html[] = R"rawliteral(
 <!DOCTYPE HTML>
 <html>
@@ -77,17 +78,17 @@ const char index_html[] = R"rawliteral(
     </style>
 </head>
 <body>
-    <h1 class="title">Contrôle d'arrosage</h1>
-    <h2 class="title">Quantité d'eau définie</h2>
+    <h1 class="title">Controle d'arrosage</h1>
+    <h2 class="title">Quantite d'eau definie</h2>
     <div class="button-container">
-        <label for="selectPump"> Pompe à utiliser :</label>
+        <label for="selectPump"> Pompe a utiliser :</label>
         <select id="selectPump" name="Pompe">
             <option value=0 selected>Pompe 1</option>
             <option value=1>Pompe 2</option>
             <option value=2>Pompe 3</option>
             <option value=3>Pompe 4</option>
         </select>
-        <label for="sliderQuantity"> Quantité d'eau à verser : <span id="sliderQuantityValue">250</span> mL</label>
+        <label for="sliderQuantity"> Quantite d'eau a verser : <span id="sliderQuantityValue">250</span> mL</label>
         <input id="sliderQuantity" type="range" min="1" max="20" value="10" class="slider">
     </div>
     <br>
@@ -98,24 +99,10 @@ const char index_html[] = R"rawliteral(
     <br>
     <h2 class="title">Mode manuel</h2>
     <div class="button-container">
-        <button id="button0" onclick="sendRequest(0)">Démarrer la pompe 1</button>
-        <button id="button1" onclick="sendRequest(1)">Démarrer la pompe 2</button>
-        <button id="button2" onclick="sendRequest(2)">Démarrer la pompe 3</button>
-        <button id="button3" onclick="sendRequest(3)">Démarrer la pompe 4</button>
-    </div>
-    <div class="button-container">
-        <label> Choisir une pompe :</label>
-        <select id="selectPump" name="Pompe">
-            <option value=0 selected>Pompe 1</option>
-            <option value=1>Pompe 2</option>
-            <option value=2>Pompe 3</option>
-            <option value=3>Pompe 4</option>
-        </select>
-
-        <label> Choisir une quantité d'eau :</label>
-        <input id="sliderQuantity" type="range" min="1" max="20" value="10" class="slider">
-        <button id="buttonDeliver" onclick="startDelivery()">Arroser</button>
-        <button id="buttonDeliverCancel" hidden="hidden" onclick="cancelDelivery()">Annuler</button>
+        <button id="button0" onclick="sendRequest(0)">Demarrer la pompe 1</button>
+        <button id="button1" onclick="sendRequest(1)">Demarrer la pompe 2</button>
+        <button id="button2" onclick="sendRequest(2)">Demarrer la pompe 3</button>
+        <button id="button3" onclick="sendRequest(3)">Demarrer la pompe 4</button>
     </div>
     <script>
         // Get elements from document
@@ -219,10 +206,10 @@ const char index_html[] = R"rawliteral(
             const button = document.getElementById('button'+buttonNumber);
             let buttonNumberTxt = buttonNumber + 1;
             if (data === 'inactive') {
-                button.textContent = 'Démarrer la pompe ' + buttonNumberTxt;
+                button.textContent = 'Demarrer la pompe ' + buttonNumberTxt;
                 button.classList.remove('red');
             } else if (data === 'active') {
-                button.textContent = 'Arrêter la pompe ' + buttonNumberTxt;
+                button.textContent = 'Arreter la pompe ' + buttonNumberTxt;
                 button.classList.add('red');
             }
         }
@@ -303,7 +290,7 @@ void handle_deliver() {
         String body = server.arg("plain"); // Get the request body as a String
 
         // JSON Parsing using ArduinoJson
-        StaticJsonDocument<200> doc; // Adjust size as needed (check with https://arduinojson.org/v6/assistant/)
+        StaticJsonDocument<64> doc; // Adjust size as needed (check with https://arduinojson.org/v6/assistant/)
         DeserializationError error = deserializeJson(doc, body);
 
         if(error) {
@@ -347,7 +334,7 @@ void handle_cancel() {
         String body = server.arg("plain"); // Get the request body as a String
 
         // JSON Parsing using ArduinoJson
-        StaticJsonDocument<200> doc; // Adjust size as needed (check with https://arduinojson.org/v6/assistant/)
+        StaticJsonDocument<64> doc; // Adjust size as needed (check with https://arduinojson.org/v6/assistant/)
         DeserializationError error = deserializeJson(doc, body);
 
         if(error) {

@@ -1,5 +1,4 @@
 #include "backend.hpp"
-#include <FastLED.h>
 
 namespace backend {
 

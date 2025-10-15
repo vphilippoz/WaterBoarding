@@ -2,6 +2,7 @@
 #define BACKEND_H
 
 #include <Arduino.h>
+#include <FastLED.h>
 
 namespace backend {
     // Constants
