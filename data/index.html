@@ -86,10 +86,10 @@
     <br>
     <h2 class="title">Mode manuel</h2>
     <div class="button-container">
-        <button id="button0" onclick="sendRequest(0)">Demarrer la pompe 1</button>
-        <button id="button1" onclick="sendRequest(1)">Demarrer la pompe 2</button>
-        <button id="button2" onclick="sendRequest(2)">Demarrer la pompe 3</button>
-        <button id="button3" onclick="sendRequest(3)">Demarrer la pompe 4</button>
+        <button id="button0" onclick="togglePump(0)">Demarrer la pompe 1</button>
+        <button id="button1" onclick="togglePump(1)">Demarrer la pompe 2</button>
+        <button id="button2" onclick="togglePump(2)">Demarrer la pompe 3</button>
+        <button id="button3" onclick="togglePump(3)">Demarrer la pompe 4</button>
     </div>
     <script>
         // Get elements from document
@@ -103,14 +103,24 @@
             sliderQuantityValue.textContent = sliderQuantity.value*25;
         });
 
-        function sendRequest(buttonNumber) {
-            fetch('/button' + buttonNumber)
-                .then(response => response.text())
-                .then(data => {
-                    console.log('Response:', data);
-                    updateButtonAppearance(buttonNumber, data);
-                })
-                .catch(error => console.error('Error:', error));
+        function togglePump(pumpID) {           
+            // Send request to server for stop the selected pump
+            let url = '/togglePump?pump_id=' + pumpID;
+            fetch(url, {
+                method: 'POST'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(data => {
+                updateButtonAppearance(pumpID, data);
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
         }
 
         function startDelivery() {
@@ -156,8 +166,8 @@
             // Get pump ID
             let pumpID = selectPump.value;
             
-            // Send request to server for given quantity on selected pump
-            let url = '/deliver_ml?pump_id=' + pumpID;
+            // Send request to server for stop the selected pump
+            let url = '/deliver_ml_cancel?pump_id=' + pumpID;
             fetch(url, {
                 method: 'POST'
             })

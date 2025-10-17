@@ -99,10 +99,10 @@ const char index_html[] = R"rawliteral(
     <br>
     <h2 class="title">Mode manuel</h2>
     <div class="button-container">
-        <button id="button0" onclick="sendRequest(0)">Demarrer la pompe 1</button>
-        <button id="button1" onclick="sendRequest(1)">Demarrer la pompe 2</button>
-        <button id="button2" onclick="sendRequest(2)">Demarrer la pompe 3</button>
-        <button id="button3" onclick="sendRequest(3)">Demarrer la pompe 4</button>
+        <button id="button0" onclick="togglePump(0)">Demarrer la pompe 1</button>
+        <button id="button1" onclick="togglePump(1)">Demarrer la pompe 2</button>
+        <button id="button2" onclick="togglePump(2)">Demarrer la pompe 3</button>
+        <button id="button3" onclick="togglePump(3)">Demarrer la pompe 4</button>
     </div>
     <script>
         // Get elements from document
@@ -116,14 +116,24 @@ const char index_html[] = R"rawliteral(
             sliderQuantityValue.textContent = sliderQuantity.value*25;
         });
 
-        function sendRequest(buttonNumber) {
-            fetch('/button' + buttonNumber)
-                .then(response => response.text())
-                .then(data => {
-                    console.log('Response:', data);
-                    updateButtonAppearance(buttonNumber, data);
-                })
-                .catch(error => console.error('Error:', error));
+        function togglePump(pumpID) {           
+            // Send request to server for stop the selected pump
+            let url = '/togglePump?pump_id=' + pumpID;
+            fetch(url, {
+                method: 'POST'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(data => {
+                updateButtonAppearance(pumpID, data);
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
         }
 
         function startDelivery() {
@@ -169,8 +179,8 @@ const char index_html[] = R"rawliteral(
             // Get pump ID
             let pumpID = selectPump.value;
             
-            // Send request to server for given quantity on selected pump
-            let url = '/deliver_ml?pump_id=' + pumpID;
+            // Send request to server for stop the selected pump
+            let url = '/deliver_ml_cancel?pump_id=' + pumpID;
             fetch(url, {
                 method: 'POST'
             })
@@ -213,8 +223,8 @@ const char index_html[] = R"rawliteral(
 )rawliteral";
 
 // Private function declaration
-void handle_root(void);
-void handle_toggle(unsigned int pump_ID, bool (*pump_toggler)(unsigned int));
+void handle_root();
+void handle_toggle();
 void handle_cancel();
 void handle_deliver();
 
@@ -243,10 +253,7 @@ void setup(bool (*pump_toggler)(unsigned int), bool (*deliver_ml)(unsigned int, 
     }
 
     server.on("/", HTTP_GET, handle_root);
-    for (int i = 0; i < NUM_PUMPS; i++) {
-        server.on(String("/button") + String(i), HTTP_GET,
-                  [i]() {handle_toggle(i, global_pump_toggler); });
-    }
+    server.on("/togglePump", HTTP_POST, handle_toggle);
     server.on("/deliver_ml", HTTP_POST, handle_deliver);
     server.on("/deliver_ml_cancel", HTTP_POST, handle_cancel);
 
@@ -262,21 +269,35 @@ void handle_root() {
     server.send(200, "text/html", index_html);
 }
 
-void handle_toggle(unsigned int pump_ID, bool (*pump_toggler)(unsigned int)) {
+void handle_toggle() {
     /**
      * @brief Handler for one of the toggling button
-     * 
-     * @param pump_ID: ID of the pump toggled
-     * @param pump_toggler: Pointer to backend function that performs the toggling 
-    */
-    // Toggle the pump
-    bool pump_state = pump_toggler(pump_ID);
+     */
+    if(server.method() == HTTP_POST) {
+        // Check if wanted parameters are present
+        if (!server.hasArg("pump_id")) {
+            Serial.println("Missing parameters");
+            server.send(400, "text/plain", "Missing parameters");
+            return;
+        }
 
-    if(VERBOSE) {Serial.println("Toggled pump " + String(pump_ID+1));}
-    
-    // Send response
-    server.send(200, "text/plain", pump_state ? "active" : "inactive");
+        // Retrieve parameters
+        unsigned int pumpID = server.arg("pump_id").toInt();
+
+        // Execute command
+        bool pumpState = global_pump_toggler(pumpID);
+
+        // Send Response
+        if (pumpState) {
+            server.send(200, "text/plain", "active"); // HTTP 200: OK
+        } else {
+            server.send(200, "text/plain", "inactive"); // HTTP 200: OK
+        }
+    } else {
+        server.send(405, "text/plain", "Method Not Allowed"); // HTTP 405: Method Not Allowed (only POST allowed)
+    }
 }
+
 
 void handle_deliver() {
     /**
