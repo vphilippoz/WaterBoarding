@@ -139,12 +139,9 @@ const char index_html[] = R"rawliteral(
             buttonCancel.removeAttribute('hidden');
 
             // Send request to server for given quantity on selected pump
-            fetch('/deliver_ml', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ quantity: ml, pump_id: pumpID })
+            let url = '/deliver_ml?quantity=' + ml + '&pump_id=' + pumpID;
+            fetch(url, {
+                method: 'POST'
             })
             .then(response => {
                 if (!response.ok) {
@@ -173,12 +170,9 @@ const char index_html[] = R"rawliteral(
             let pumpID = selectPump.value;
             
             // Send request to server for given quantity on selected pump
-            fetch('/deliver_ml_cancel', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({pump_id: pumpID })
+            let url = '/deliver_ml?pump_id=' + pumpID;
+            fetch(url, {
+                method: 'POST'
             })
             .then(response => {
                 if (!response.ok) {
@@ -228,9 +222,11 @@ void setup(bool (*pump_toggler)(unsigned int), bool (*deliver_ml)(unsigned int, 
     /**
      * @brief Setup the web interface
     */
-    // Save the pointer to pump toggler function, which ensures that the 
-    // toggler function is always accessible in the handle_toggle function
+    // Save the pointer to backend functions, which ensures that the 
+    // backend functions are always accessible in the handler functions
     global_pump_toggler = pump_toggler;
+    global_deliver_ml = deliver_ml;
+    global_reset_pump = reset_pump;
     NUM_PUMPS = num_pumps;
     VERBOSE = verbose;
 
@@ -287,30 +283,16 @@ void handle_deliver() {
      * @brief Handler for the deliver button
      */
     if(server.method() == HTTP_POST) {
-        String body = server.arg("plain"); // Get the request body as a String
-
-        // JSON Parsing using ArduinoJson
-        StaticJsonDocument<64> doc; // Adjust size as needed (check with https://arduinojson.org/v6/assistant/)
-        DeserializationError error = deserializeJson(doc, body);
-
-        if(error) {
-            Serial.print(F("deserializeJson() failed: "));
-            Serial.println(error.c_str());
-            server.send(400, "text/plain", "Invalid JSON"); // HTTP 400: Bad Request
-            return;
-        }
-
         // Check if wanted parameters are present
-        if(!doc.containsKey("quantity") || !doc["quantity"].is<int>() ||
-            !doc.containsKey("pump_id") || !doc["pump_id"].is<int>()) {
-            Serial.println("Missing or invalid parameters");
-            server.send(400, "text/plain", "Missing or invalid parameters");
+         if (!server.hasArg("quantity") || !server.hasArg("pump_id")) {
+            Serial.println("Missing parameters");
+            server.send(400, "text/plain", "Missing parameters");
             return;
         }
 
         // Retrieve parameters
-        unsigned int quantity = doc["quantity"];
-        unsigned int pumpID = doc["pump_id"];
+        unsigned int quantity = server.arg("quantity").toInt();
+        unsigned int pumpID = server.arg("pump_id").toInt();
 
         // Execute command
         bool deliverySuccess = global_deliver_ml(pumpID, quantity);
@@ -331,28 +313,15 @@ void handle_cancel() {
      * @brief Handler for one of the cancel button
     */
     if(server.method() == HTTP_POST) {
-        String body = server.arg("plain"); // Get the request body as a String
-
-        // JSON Parsing using ArduinoJson
-        StaticJsonDocument<64> doc; // Adjust size as needed (check with https://arduinojson.org/v6/assistant/)
-        DeserializationError error = deserializeJson(doc, body);
-
-        if(error) {
-            Serial.print(F("deserializeJson() failed: "));
-            Serial.println(error.c_str());
-            server.send(400, "text/plain", "Invalid JSON"); // HTTP 400: Bad Request
-            return;
-        }
-
         // Check if wanted parameters are present
-        if(!doc.containsKey("pump_id") || !doc["pump_id"].is<int>()) {
-            Serial.println("Missing or invalid parameters");
-            server.send(400, "text/plain", "Missing or invalid parameters");
+         if (!server.hasArg("pump_id")) {
+            Serial.println("Missing parameters");
+            server.send(400, "text/plain", "Missing parameters");
             return;
         }
 
         // Retrieve parameters
-        unsigned int pumpID = doc["pump_id"];
+        unsigned int pumpID = server.arg("pump_id").toInt();
 
         // Execute command
         bool pumpActive = global_reset_pump(pumpID);

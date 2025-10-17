@@ -126,12 +126,9 @@
             buttonCancel.removeAttribute('hidden');
 
             // Send request to server for given quantity on selected pump
-            fetch('/deliver_ml', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ quantity: ml, pump_id: pumpID })
+            let url = '/deliver_ml?quantity=' + ml + '&pump_id=' + pumpID;
+            fetch(url, {
+                method: 'POST'
             })
             .then(response => {
                 if (!response.ok) {
@@ -160,12 +157,9 @@
             let pumpID = selectPump.value;
             
             // Send request to server for given quantity on selected pump
-            fetch('/deliver_ml_cancel', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({pump_id: pumpID })
+            let url = '/deliver_ml?pump_id=' + pumpID;
+            fetch(url, {
+                method: 'POST'
             })
             .then(response => {
                 if (!response.ok) {
