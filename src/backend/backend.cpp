@@ -1,11 +1,11 @@
 #include "backend.hpp"
-#include <FastLED.h>
 
 namespace backend {
 
 // Global variables definition
 bool VERBOSE = false;
 bool pumps_active[] = {false, false, false, false};
+struct tm timeinfo;
 CRGB led[NUM_LEDS];
 
 // Private function declaration
@@ -31,12 +31,17 @@ void setup(bool verbose) {
     FastLED.show();
 
     // Initialize time synchronisation
-    configTime(0, 0, "pool.ntp.org");
+    while(!getLocalTime(&timeinfo)){
+        configTime(TIMEZONE_OFFSET, DAYLIGHT_SAVINGS_OFFSET, NTP_SERVER);
+        Serial.println("Waiting for time synchronization...");
+        delay(500);
+    }
+    if(VERBOSE) {Serial.println("Current time: " + String(timeinfo.tm_hour) + ":" + String(timeinfo.tm_min));}
 }
 
 bool toggle_pump(unsigned int pump_ID) {
     /**
-     * @brief Toggles a pump and update the LED color correspondingly
+     * @brief Toggles a pump and update the LED color accordingly
      * 
      * @param pump_ID: ID of the pump to toggle
      * @return New state of the pump (true == active)
@@ -54,7 +59,7 @@ bool toggle_pump(unsigned int pump_ID) {
 
 bool set_pump(unsigned int pump_ID) {
     /**
-     * @brief Activates a pump and update the LED color correspondingly
+     * @brief Activates a pump and update the LED color accordingly
      * 
      * @param pump_ID: ID of the pump to activate
      * @return New state of the pump (true == active)
@@ -79,7 +84,7 @@ bool set_pump(unsigned int pump_ID) {
 
 bool reset_pump(unsigned int pump_ID) {
     /**
-     * @brief Deactivates a pump and update the LED color correspondingly
+     * @brief Deactivates a pump and update the LED color accordingly
      * 
      * @param pump_ID: ID of the pump to deactivate
      * @return New state of the pump (true == active)
@@ -128,6 +133,10 @@ void deliver_ml(unsigned int pump_ID, unsigned int volume_ml) {
      * @param volume_ml: Volume of water to deliver (in mL)
     */
     // To be implemented
+
+    set_pump(pump_ID);
+    delay(volume_ml); // Placeholder: 1 mL per millisecond
+    reset_pump(pump_ID);
 }
 
 void handle_schedule() {
@@ -135,12 +144,14 @@ void handle_schedule() {
      * @brief Follow a predefined watering schedule
     */
     // Get current time
-    struct tm timeinfo;
-    if(!getLocalTime(&timeinfo)) {
-        if(VERBOSE) {Serial.println("Failed to obtain time");}
-        return;
-    }
+    
+    // if(!getLocalTime(&timeinfo)) {
+    //     if(VERBOSE) {Serial.println("Failed to obtain time");}
+    //     return;
+    // }
+    while(!getLocalTime(&timeinfo));
     static unsigned int last_handled_minute = 61; // Initialize to an invalid minute to ensure the schedule is handled at startup
+    if(VERBOSE) {Serial.println("Current time: " + String(timeinfo.tm_hour) + ":" + String(timeinfo.tm_min));}
 
     // Only handle the schedule once per minute
     if(timeinfo.tm_min == last_handled_minute) {return;}
